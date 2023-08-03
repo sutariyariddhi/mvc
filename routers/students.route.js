@@ -3,7 +3,7 @@ const{student_add}=require("../controllers/student.controller")
 const{chek_data}=require("../middleware/student.middleware")
 let router=Router();
 router.get("/" , (req,res)=>{
-    res.send("welcome to the express ");
+    res.render("home")
 })
 router.get("/form", (req, res) => {
     res.render("index");
