@@ -6,4 +6,32 @@ const chek_data=(req,res,next)=>{
         res.send("enter a valid details")
     }
 }
-module.exports={chek_data}
+const checkCookies = (req, res, next) => {
+    console.log(req.cookies);
+  
+    if(req.cookies.user){
+  
+      next();
+    }
+    else{
+      res.redirect("/student/signup");
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+  // ///////////////////////////////////////////////////////////////////////
+
+
+
+ 
+  module.exports = { chek_data,checkCookies };

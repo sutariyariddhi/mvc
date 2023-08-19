@@ -4,7 +4,8 @@ let studentSchema=new mongoose.Schema({
     number:Number,
     course:String,
     grid:Number,
-    city:String
+    city:String,
+    image:String
 })
 const student=mongoose.model("student",studentSchema)
 module.exports=student
