@@ -1,72 +1,142 @@
-
-const{Router}=require("express");
-const{student_add ,StudentImage,}=require("../controllers/student.controller")
-const{chek_data,checkCookies}=require("../middleware/student.middleware")
+const { Router } = require("express");
+const {
+  student_add,
+  StudentImage,
+  studentdata,
+  getadmin,
+} = require("../controllers/student.controller");
+const { chek_data, checkCookies } = require("../middleware/student.middleware");
 const multer = require("multer");
-let router=Router();
+const user = require("../models/studentsignup");
+const passport = require("passport");
+const isAuth = require("../middleware/isauth");
+// img upload
+let router = Router();
 let storage = multer.diskStorage({
   destination: "images",
   filename: (req, file, cb) => {
-    cb(null, Date.now()+file.originalname);
+    cb(null, Date.now() + file.originalname);
   },
 });
-
 const upload = multer({
   storage: storage,
 }).single("profile");
-
-router.patch("/images/:id", upload, StudentImage);
 router.post("/images", upload, StudentImage);
-
-router.get("/" , (req,res)=>{
-    res.render("home")
-})
+router.get("/", getadmin);
 router.get("/upload", (req, res) => {
-  res.render("imgupload")
+  res.render("imgupload");
+});
+
+router.get("/login", (req, res) => {
+  res.render("login");
+});
+
+router.get("/data", studentdata);
+
+router.get("/signup", (req, res) => {
+  res.render("signup");
+});
+
+router.get("/home", (req, res) => {
+  res.render("index");
+});
+
+router.get("/signup", (req, res) => {
+  res.render("signup");
+});
+router.post("/signup", async (req, res) => {
+  console.log(req.body);
+  await user.create(req.body);
+  res.cookie("user", req.body.username);
+  res.send("checking ");
+});
+
+router.post("/add", studentdata, student_add);
+router.get("/login",(req,res)=>{
+  res.send("well done")
 })
-router.get("/form", (req, res) => {
-    res.render("index");
-  });
-  
-  router.get("/signup", (req, res) => {
-    res.render("signup");
-  });
-  router.get("/login", (req, res) => {
-    res.render("login");
-  });
-  // router.get("/data",studentdata )
-  
-  
-  router.get("/signup", (req, res) => {
-    res.render("signup")
-  })
-  
-  router.post("/signup", async(req, res) => {
-    res.send("welcome")
-    console.log(req.body);
-    
-  })
-  router.post("/login", async(req, res) => {
-    res.send("welcome")
-  
-    
-  })
-  router.get("/setcookie", (req, res) => {
-  res.cookie("cookie","array")
-    res.send(" cookies ")
-  })
-  
- 
-  
-  router.get("/session", (req, res) => {
-    if(req.session.visit){
-      req.session.visit++
-      res.send(`session ${req.session.visit}`)
+router.get("/setcookie", (req, res) => {
+  res.cookie("cookie", "array");
+  res.send(" cookies ");
+});
+let count = 0;
+router.get("/count", (req, res) => {
+  count++;
+  res.send(`total ${count}`);
+});
+router.get("/session", (req, res) => {
+  if (req.session.visit) {
+    req.session.visit++;
+    res.send(`session ${req.session.visit}`);
+  } else {
+    req.session.visit = 1;
+    res.send(`session ${req.session.visit}`);
+  }
+});
+// login
+router.get("/login", (req, res) => {
+  res.render("login");
+});
+router.post(
+  "/login",
+  passport.authenticate("local", {
+    successRedirect: "/student",
+    failureRedirect: "/student/login",
+  }),
+  async (req, res) => {
+    res.send("done");
+  }
+);
+
+router.get("/getstudent", isAuth, (req, res) => {
+  console.log(req.user);
+  res.send(req.user);
+});
+
+router.get("/logout", (req, res) => {
+  req.logOut((err) => {
+    if (err) {
+      console.log(err);
     }
-    else{
-      req.session.visit=1
-      res.send(`session ${req.session.visit}`)
+  });
+  res.send("logout");
+});
+
+router.get("/user", isAuth, (req, res) => {
+  res.render("profile");
+});
+
+router.get("/userdetails", isAuth, (req, res) => {
+  res.send(req.user);
+});
+
+let otp = Math.floor(Math.random() * 10000);
+
+router.get("/sendmail", (req, res) => {
+  const mailOptions = {
+    from: "nikunjnavapara1230@gmail.com",
+    to: "rw5.rajat.as@gmail.com",
+    subject: "node mailer testing",
+    html: `<a href="localhost:8090/student/verify/"${otp}> OTP ${otp}</a>`,
+  };
+
+  transport.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(info);
     }
-  })
-router.post("/add",chek_data,student_add)
-module.exports=router;
+
+    res.send("testing mailer");
+  });
+});
+
+router.get("/verify/:otp", (req, res) => {
+  if (otp == req.params.otp) {
+    res.send("otp match");
+  } else {
+    res.send("verify not match");
+  }
+});
+
+module.exports = router;

@@ -1,17 +1,14 @@
-const loginuser = require("../models/login-schema");
+const loginuser = require("../models/studentsignup");
 
-const localStrategy = require("passport-local").Strategy;
-const initializePassport = (passport) => {
+const LocalStrategy = require("passport-local").Strategy;
+const localization = (passport) => {
   passport.use(
-    new localStrategy(async (email, password, done, message) => {
+    new LocalStrategy(async (username, password, done) => {
+      let userdata = await loginuser.findOne({ username: username });
       try {
-        let user = await loginuser.findOne({ email });
-        if (!user) return done(null, false, { message: "User not found" });
-
-        if (user.password != password)
-          return done(null, false, { message: "Password mismatch" });
-
-        return done(null, user);
+        if (!userdata) return done(null, false);
+        if (userdata.password !== password) return done(null, false);
+        return done(null, userdata);
       } catch (error) {
         return done(error, false);
       }
@@ -19,21 +16,12 @@ const initializePassport = (passport) => {
   );
 
   passport.serializeUser((user, done) => {
-    try {
-      return done(null, user.id);
-    } catch (error) {
-      return done(error, false);
-    }
+    done(null, user.id);
   });
 
   passport.deserializeUser(async (id, done) => {
-    let user = await loginuser.findById(id);
-    try {
-      return done(null, user);
-    } catch (error) {
-      return done(error, false);
-    }
+    let data = await loginuser.findById(id);
+    done(null, data);
   });
-};
-
-module.exports = initializePassport;
+}
+module.exports = localization;

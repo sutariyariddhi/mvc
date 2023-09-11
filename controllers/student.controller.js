@@ -18,22 +18,18 @@ const StudentImage = async (req, res) => {
   res.send("image added successfully");
 };
 
-const studentdata=async(req, res) => {
-  let data=await Student.find()
-    res.send(data)
-  }
 
 
   // passport
   const getadmin = (req, res) => {
     res.render("index");
   };
-  const admin = (req, res) => {
-    model.create(req.body);
-    let user = model.findOne({ username: req.body.username });
-    if (user) res.status(404).render("login");
   
-    res.status(201).send("User added successfully");
-  };
+  const studentdata=async(req, res) => {
+    let data=await Student.find()
+      res.send(data)
+    }
+  
 
-module.exports = { student_add, StudentImage ,studentdata,getadmin,admin};
+
+module.exports = { student_add, StudentImage ,studentdata,getadmin};

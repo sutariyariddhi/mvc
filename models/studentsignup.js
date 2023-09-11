@@ -8,5 +8,5 @@ password:String
   
 });
 
-const user = mongoose.model("user", studentSchema);
-module.exports =user
+const loginuser = mongoose.model("loginuser", studentSchema);
+module.exports =loginuser

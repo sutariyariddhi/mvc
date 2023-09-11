@@ -19,19 +19,14 @@ const checkCookies = (req, res, next) => {
   }
 
 
+module.exports={checkCookies,chek_data}
 
 
 
 
 
 
-
-
-
-
-  // ///////////////////////////////////////////////////////////////////////
 
 
 
  
-  module.exports = { chek_data,checkCookies };
