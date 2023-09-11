@@ -6,6 +6,7 @@ const session = require("express-session");
 const passport = require("passport");
 const localization = require("./middleware/login-middleware");
 const productroute = require("./routers/product-route");
+const blogrouter = require("./routers/blog-route");
 
 
 
@@ -26,6 +27,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/student", router);
 app.use("/product",productroute)
+app.use("/blog",blogrouter)
 app.listen(8090,()=>{
     console.log("listening on port");
     connect();
